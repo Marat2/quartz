@@ -21,9 +21,9 @@ public class HelloJobListener implements JobListener {
     }
 
     public void jobWasExecuted(JobExecutionContext context,JobExecutionException jobException) {
-        System.out.println("jon_key"+context.getJobDetail().getKey());
-        System.out.println(context.getMergedJobDataMap().getString("start_date"));
-        System.out.println(context.getMergedJobDataMap().getString("end_date"));
+        //System.out.println("jon_key"+context.getJobDetail().getKey());
+        //System.out.println(context.getMergedJobDataMap().getString("start_date"));
+        //System.out.println(context.getMergedJobDataMap().getString("end_date"));
         System.out.println("job was executed update db");
     }
 
