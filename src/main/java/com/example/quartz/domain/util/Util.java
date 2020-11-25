@@ -14,10 +14,10 @@ import java.util.Map;
 public class Util {
 
     public static SessionFactory sessionFactory;
-    public static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String USER = "jmuser";
-    public static final String PASS = "QazQwe!23456";
-    public static final String URL = "jdbc:mysql://localhost:3306/jm?useSSL=false&serverTimezone=UTC";
+    public static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
+    public static final String USER = "mobile";
+    public static final String PASS = "NVxzpq1tmoi";
+    public static final String URL = "jdbc:oracle:thin:@172.25.1.11:1521:prepaid";
 
 
     public static SessionFactory getHibernateConnect(){

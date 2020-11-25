@@ -5,17 +5,17 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "setting")
+@Table(name = "zero_comission")
 public class Settings implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "start")
+    @Column(name = "start_time")
     private Timestamp start;
 
-    @Column(name = "end")
+    @Column(name = "end_time")
     private Timestamp end;
 
     @Column(name = "status")
