@@ -7,6 +7,7 @@ import org.hibernate.query.Query;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Component
@@ -22,4 +23,17 @@ public class SettingDaoHibernateImpl implements SettingDao{
         session.close();
         return results;
     }
+
+    @Override
+    public void updateRow(String id) {
+        Session session = Util.getHibernateConnect().openSession();
+        String hql = "update Settings s set s.status = 'old' where s.id=:id";
+        Query query3 = session.createQuery(hql);
+        query3.setParameter("id", Integer.valueOf(id));
+
+        query3.executeUpdate();
+        session.close();
+    }
+
+
 }

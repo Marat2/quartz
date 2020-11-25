@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface SettingDao {
     List<Settings> getAllSettings();
+
+    void updateRow(String id);
 }

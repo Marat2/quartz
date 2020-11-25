@@ -46,14 +46,12 @@ public class TestScheduler {
 
         //add jobs and triggers into sched (old job and triggers replaced by new)
         for (Settings row :settingDaoHibernateImpl.getAllSettings()){
-            System.out.println(row.toString());
+            //System.out.println(row.toString());
             Date start = new Date(row.getStart().getTime());
             Date end = new Date(row.getEnd().getTime());
 
-
-
             JobDetail StartJob = newJob(HelloJob.class).withIdentity("startjob_"+row.getId(), "group1").
-                    usingJobData("start_date",start.getTime()).usingJobData("end_date",end.getTime()).storeDurably(true).build();
+                    usingJobData("job_id",row.getId()).storeDurably(true).build();
             JobDetail EndJob = newJob(ByeJob.class).withIdentity("endjob_"+row.getId(), "group1").storeDurably(true).build();
 
             //add listener to job
@@ -67,41 +65,14 @@ public class TestScheduler {
                     .startAt(end).forJob("endjob_"+row.getId(), "group1").build();
             StartJob.getKey();
 
-
-            System.out.println("tr : "+scheduler.getJobKeys(groupEquals("group1")).contains(StartJob.getKey()));
+            //System.out.println("tr : "+scheduler.getJobKeys(groupEquals("group1")).contains(StartJob.getKey()));
             if (!scheduler.getJobKeys(groupEquals("group1")).contains(StartJob.getKey()) && ! scheduler.getJobKeys(groupEquals("group1")).contains(EndJob.getKey())) {
                 scheduler.scheduleJob(StartJob, StartTrigger);
                 scheduler.scheduleJob(EndJob, EndTrigger);
             }
         }
-
-        //обойти триггеры и установить job
-            System.out.println("size job: "+scheduler.getJobKeys(groupEquals("group1")).size());
-            for(TriggerKey triggerKey : scheduler.getTriggerKeys(groupEquals("group1"))) {
-                System.out.println("Found trigger identified by: " + triggerKey);
-            }
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
-
-
-        /*if (settingDaoHibernateImpl.getAllSettings().get(0).getStatus().equals("new")){
-            Date date=new Date(settingDaoHibernateImpl.getAllSettings().get(0).getStart().getTime());
-            System.out.println("Fixed delay task - " + date);
-            try {
-                //Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-                //scheduler.start();
-
-                JobDetail job = newJob(HelloJob.class).withIdentity("job1", "group1").build();
-                SimpleTrigger trigger = (SimpleTrigger) newTrigger().withIdentity("trigger1", "group1")
-                        .startAt(date).forJob("job1", "group1").build();
-                scheduler.scheduleJob(job, trigger);
-
-                scheduler.shutdown();
-            } catch (SchedulerException se) {
-                se.printStackTrace();
-            }
-        }*/
-
     }
 }

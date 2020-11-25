@@ -6,6 +6,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-@ComponentScan(basePackages = "com.example.quartz.scheduler")
+@ComponentScan(basePackages = "com.example")
 public class SpringConfig {
 }
