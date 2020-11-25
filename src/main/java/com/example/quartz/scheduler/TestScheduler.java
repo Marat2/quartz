@@ -46,17 +46,16 @@ public class TestScheduler {
 
         //add jobs and triggers into sched (old job and triggers replaced by new)
         for (Settings row :settingDaoHibernateImpl.getAllSettings()){
+            System.out.println(row.toString());
             Date start = new Date(row.getStart().getTime());
             Date end = new Date(row.getEnd().getTime());
 
-            System.out.println(row.toString());
+
 
             JobDetail StartJob = newJob(HelloJob.class).withIdentity("startjob_"+row.getId(), "group1").
                     usingJobData("start_date",start.getTime()).usingJobData("end_date",end.getTime()).storeDurably(true).build();
             JobDetail EndJob = newJob(ByeJob.class).withIdentity("endjob_"+row.getId(), "group1").storeDurably(true).build();
 
-            //scheduler.addJob(StartJob, true);
-            //scheduler.addJob(EndJob, true);
             //add listener to job
             HelloJobListener jb = new HelloJobListener("startjob_"+row.getId()+"_listener");
             scheduler.getListenerManager().addJobListener(jb, KeyMatcher.keyEquals(jobKey("startjob_"+row.getId(), "group1")));
@@ -66,19 +65,14 @@ public class TestScheduler {
 
             SimpleTrigger EndTrigger = (SimpleTrigger) newTrigger().withIdentity("endtrigger"+row.getId(), "group1")
                     .startAt(end).forJob("endjob_"+row.getId(), "group1").build();
+            StartJob.getKey();
 
 
-                //add triggers to sched
-                //scheduler.rescheduleJob(triggerKey("starttrigger"+row.getId(), "group1"), StartTrigger);
-                //scheduler.rescheduleJob(triggerKey("endtrigger1"+row.getId(), "group1"), EndTrigger);
-
-            //SimpleTrigger oldTrigger = (SimpleTrigger) scheduler.getTrigger(triggerKey("startjob_"+row.getId(), "group1"));
-            //System.out.println("start "+oldTrigger);
-            scheduler.scheduleJob(StartJob,StartTrigger);
-            scheduler.scheduleJob(EndJob,EndTrigger);
-            //TriggerBuilder tb = oldTrigger.getTriggerBuilder();
-            //SimpleTrigger newTrigger = (SimpleTrigger) scheduler.getTrigger(triggerKey("startjob_"+row.getId(), "group1"));
-            //System.out.println("end "+newTrigger);
+            System.out.println("tr : "+scheduler.getJobKeys(groupEquals("group1")).contains(StartJob.getKey()));
+            if (!scheduler.getJobKeys(groupEquals("group1")).contains(StartJob.getKey()) && ! scheduler.getJobKeys(groupEquals("group1")).contains(EndJob.getKey())) {
+                scheduler.scheduleJob(StartJob, StartTrigger);
+                scheduler.scheduleJob(EndJob, EndTrigger);
+            }
         }
 
         //обойти триггеры и установить job
