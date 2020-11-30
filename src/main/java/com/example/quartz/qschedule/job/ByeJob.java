@@ -11,14 +11,12 @@ import org.quartz.JobExecutionException;
 public class ByeJob implements Job {
 
 
-    private SettingDaoHibernateImpl settingDaoHibernateImpl;
     private ZeroSetting z ;
 
     public ByeJob() {
     }
 
-    public ByeJob(SettingDaoHibernateImpl settingDaoHibernateImpl, ZeroSetting z) {
-        this.settingDaoHibernateImpl = settingDaoHibernateImpl;
+    public ByeJob(ZeroSetting z) {
         this.z = z;
     }
 

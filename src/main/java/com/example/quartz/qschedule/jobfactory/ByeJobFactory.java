@@ -12,17 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ByeJobFactory implements JobFactory {
 
-    private SettingDaoHibernateImpl settingDaoHibernateImpl;
     private ZeroSetting s;
 
 
-    public ByeJobFactory(SettingDaoHibernateImpl settingDaoHibernateImpl, ZeroSetting s) {
-        this.settingDaoHibernateImpl = settingDaoHibernateImpl;
+    public ByeJobFactory(ZeroSetting s) {
         this.s = s;
     }
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) {
-        return new ByeJob(settingDaoHibernateImpl, s);
+        return new ByeJob(s);
     }
 }

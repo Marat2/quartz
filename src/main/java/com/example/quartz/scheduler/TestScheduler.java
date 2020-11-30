@@ -83,6 +83,7 @@ public class TestScheduler {
 
             JobDetail startJob = driverMatcherJobDetailHello(row.getId().toString());
             JobDetail endJob = driverMatcherJobDetailBye(row.getId().toString());
+
             Trigger triggerHello = simpleTriggerWithIdentityForHello(startJob,start,row.getId().toString());
             Trigger triggerBye = simpleTriggerWithIdentityForBye(endJob,end,row.getId().toString());
 
@@ -91,11 +92,17 @@ public class TestScheduler {
             if (!instanceH.getJobKeys(groupEquals("group1")).contains(startJob.getKey()) ) {
                 instanceH.scheduleJob(startJob, triggerHello);
             }
-            if (! instanceB.getJobKeys(groupEquals("group1")).contains(endJob.getKey())) {
+            if (! instanceB.getJobKeys(groupEquals("group2")).contains(endJob.getKey())) {
                 instanceB.scheduleJob(endJob, triggerBye);
             }
             logger.info("bean after : "+settings.getName());
         }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        try {
+            System.out.println("group1 : "+instanceH.getJobKeys(groupEquals("group1")));
+            System.out.println("group2 : "+instanceB.getJobKeys(groupEquals("group2")));
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -132,7 +139,7 @@ public class TestScheduler {
     private JobDetail driverMatcherJobDetailBye(String rideId) {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("job_id", rideId);
-        return JobBuilder.newJob().ofType(ByeJob.class).withIdentity("endjob_"+rideId, "group1").
+        return JobBuilder.newJob().ofType(ByeJob.class).withIdentity("endjob_"+rideId, "group2").
                 usingJobData(jobDataMap).storeDurably(true).build();
     }
 }
