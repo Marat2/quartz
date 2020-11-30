@@ -3,6 +3,7 @@ package com.example.quartz.domain.dao;
 import com.example.quartz.domain.model.Settings;
 import com.example.quartz.domain.util.Util;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
@@ -26,14 +27,15 @@ public class SettingDaoHibernateImpl implements SettingDao{
     }
 
     @Override
-    @Transactional
     public void updateRow(String id) {
         Session session = Util.getHibernateConnect().openSession();
+        Transaction txn = session.beginTransaction();
         String hql = "update Settings s set s.status = 'old' where s.id=:id";
         Query query3 = session.createQuery(hql);
-        query3.setParameter("id", Integer.valueOf(id));
+        query3.setParameter("id", Long.valueOf(id));
 
         query3.executeUpdate();
+        txn.commit();
         session.close();
     }
 
