@@ -6,27 +6,20 @@ import com.example.quartz.domain.dao.SettingDaoHibernateImpl;
 import com.example.quartz.domain.model.Settings;
 import com.example.quartz.qschedule.job.ByeJob;
 import com.example.quartz.qschedule.job.HelloJob;
-import com.example.quartz.qschedule.jobfactory.ByeJobFactory;
 import com.example.quartz.qschedule.jobfactory.HelloJobFactory;
-import com.example.quartz.qschedule.joblistener.HelloJobListener;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.impl.matchers.KeyMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
 
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.JobKey.jobKey;
-import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.TriggerKey.triggerKey;
+
 import static org.quartz.impl.matchers.GroupMatcher.groupEquals;
 
 @Component
@@ -34,21 +27,13 @@ public class TestScheduler {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-
-    /*@Autowired
-    @Qualifier("hello")
-    StdSchedulerFactory factoryH;
-    @Qualifier("bye")
-    StdSchedulerFactory factoryB;*/
-
     private Scheduler instanceH;
-    //private Scheduler instanceB;
     private SettingDaoHibernateImpl settingDaoHibernateImpl;
     private ZeroSetting settings;
 
-    @Autowired
-    public TestScheduler(HelloJobFactory jobFactory/*, ByeJobFactory jonFactoryB*/,
-                         @Qualifier("hello") StdSchedulerFactory factoryH, /*@Qualifier("bye") StdSchedulerFactory factoryB,*/
+    //@Autowired
+    public TestScheduler(HelloJobFactory jobFactory,
+                         @Qualifier("hello") StdSchedulerFactory factoryH,
                          SettingDaoHibernateImpl settingDaoHibernateImpl, ZeroSetting settings) {
          try{
              this.settingDaoHibernateImpl = settingDaoHibernateImpl;
@@ -57,12 +42,6 @@ public class TestScheduler {
              instanceH = factoryH.getScheduler();
              instanceH.setJobFactory(jobFactory);
              instanceH.start();
-             //System.out.println("222 :  "+factoryH.getScheduler()+" "+factoryB.getScheduler());
-             /*System.out.println("sss :  "+instanceH+" "+instanceB);
-             instanceB = factoryB.getScheduler();//из за того что они возвращают одинаковый объект по сути далее я просто меняю фабрику у одного и того же шедулера
-             instanceB.setJobFactory(jonFactoryB);
-             instanceB.start();*/
-             //System.out.println("sss :  "+instanceH+" "+instanceB);
              logger.debug("Quartz matching job scheduler started running");
          } catch (SchedulerException ex) {
              logger.error("There was a problem with scheduler or job factory", ex);
@@ -77,14 +56,14 @@ public class TestScheduler {
         try {
         //add jobs and triggers into sched (old job and triggers replaced by new)
         for (Settings row :settingDaoHibernateImpl.getAllSettings()){
-            Date start = new Date(row.getStart().getTime());
-            Date end = new Date(row.getEnd().getTime());
+            //Date start = new Date(row.getStart().getTime());
+            //Date end = new Date(row.getEnd().getTime());
+            Date start =  Date.from(row.getStart().toInstant());
+            Date end =  Date.from(row.getEnd().toInstant());
 
             JobDetail startJob = driverMatcherJobDetailHello(row.getId().toString());
-            //JobDetail endJob = driverMatcherJobDetailBye(row.getId().toString());
             JobDetail endJob = driverMatcherJobDetailHello("end_"+row.getId().toString());
             Trigger triggerHello = simpleTriggerWithIdentityForHello(startJob,start,row.getId().toString());
-            //Trigger triggerBye = simpleTriggerWithIdentityForBye(endJob,end,row.getId().toString());
             Trigger triggerBye = simpleTriggerWithIdentityForHello(endJob,end,"end_"+row.getId().toString());
             logger.info("bean : "+settings.getName());
 
@@ -94,25 +73,11 @@ public class TestScheduler {
             if (!instanceH.getJobKeys(groupEquals("group1")).contains(endJob.getKey()) ) {
                 instanceH.scheduleJob(endJob, triggerBye);
             }
-            /*if (! instanceB.getJobKeys(groupEquals("group2")).contains(endJob.getKey())) {
-                instanceB.scheduleJob(endJob, triggerBye);
-            }*/
             logger.info("bean after : "+settings.getName());
         }
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
-        //try {
-            //System.out.println("group1 : "+instanceH.getJobKeys(groupEquals("group1")));
-            //System.out.println("group2 : "+instanceB.getJobKeys(groupEquals("group2")));
-        //} catch (SchedulerException e) {
-        //    e.printStackTrace();
-        //}
-    }
-
-    @PostConstruct
-    public void init() {
-        logger.info("Hello world from Quartz...");
     }
 
     private Trigger simpleTriggerWithIdentityForHello(JobDetail jobDetail, Date localDateTime, String triggerKey) {
@@ -128,21 +93,6 @@ public class TestScheduler {
         jobDataMap.put("job_id", rideId);
 
         return JobBuilder.newJob().ofType(HelloJob.class).withIdentity("startjob_"+rideId, "group1").
-                usingJobData(jobDataMap).storeDurably(true).build();
-    }
-
-    private Trigger simpleTriggerWithIdentityForBye(JobDetail jobDetail, Date localDateTime, String triggerKey) {
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail)
-                .withIdentity(TriggerKey.triggerKey("endtrigger"+triggerKey))
-                .startAt(localDateTime)
-                .build();
-    }
-
-    private JobDetail driverMatcherJobDetailBye(String rideId) {
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("job_id", rideId);
-        return JobBuilder.newJob().ofType(ByeJob.class).withIdentity("endjob_"+rideId, "group2").
                 usingJobData(jobDataMap).storeDurably(true).build();
     }
 }

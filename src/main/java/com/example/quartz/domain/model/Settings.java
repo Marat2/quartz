@@ -3,6 +3,7 @@ package com.example.quartz.domain.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "zero_comission")
@@ -13,13 +14,14 @@ public class Settings implements Serializable {
     private Long id;
 
     @Column(name = "start_time")
-    private Timestamp start;
+    private ZonedDateTime start;
 
     @Column(name = "end_time")
-    private Timestamp end;
+    private ZonedDateTime end;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
         public Settings() {
 
@@ -33,27 +35,27 @@ public class Settings implements Serializable {
         this.id = id;
     }
 
-    public Timestamp getStart() {
+    public ZonedDateTime getStart() {
         return start;
     }
 
-    public void setStart(Timestamp start) {
+    public void setStart(ZonedDateTime start) {
         this.start = start;
     }
 
-    public Timestamp getEnd() {
+    public ZonedDateTime getEnd() {
         return end;
     }
 
-    public void setEnd(Timestamp end) {
+    public void setEnd(ZonedDateTime end) {
         this.end = end;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

@@ -18,7 +18,7 @@ public class SettingDaoHibernateImpl implements SettingDao{
     public List<Settings> getAllSettings() {
         Session session = Util.getHibernateConnect().openSession();
         session.beginTransaction();
-        String hql = "FROM Settings WHERE status = 'new'";
+        String hql = "FROM Settings WHERE status = 'NEW'";
         Query query = session.createQuery(hql);
         List results = query.list();
         session.getTransaction().commit();
@@ -27,15 +27,15 @@ public class SettingDaoHibernateImpl implements SettingDao{
     }
 
     @Override
-    public void updateRow(String id) {
+    public void updateRow(Long id) {
         Session session = Util.getHibernateConnect().openSession();
-        Transaction txn = session.beginTransaction();
-        String hql = "update Settings s set s.status = 'old' where s.id=:id";
+        //Transaction txn = session.beginTransaction();
+        String hql = "update Settings s set s.status = 'OLD' where s.id=:id";
         Query query3 = session.createQuery(hql);
-        query3.setParameter("id", Long.valueOf(id));
+        query3.setParameter("id", id);
 
         query3.executeUpdate();
-        txn.commit();
+        //txn.commit();
         session.close();
     }
 

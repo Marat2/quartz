@@ -9,6 +9,8 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+
 
 public class HelloJob implements Job {
 
@@ -23,7 +25,7 @@ public class HelloJob implements Job {
         this.settingDaoHibernateImpl = settingDaoHibernateImpl;
         this.z=z;
     }
-
+    @Transactional
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
         JobDataMap data = context.getMergedJobDataMap();
@@ -33,7 +35,8 @@ public class HelloJob implements Job {
 
         if (data.get("job_id").toString().startsWith("end_")){
             System.out.println("ggg");
-            String id = data.get("job_id").toString().substring(data.get("job_id").toString().indexOf("_")+1);
+            //String id = data.get("job_id").toString().substring(data.get("job_id").toString().indexOf("_")+1);
+            Long id = Long.valueOf(data.get("job_id").toString().substring(data.get("job_id").toString().indexOf("_")+1));
             settingDaoHibernateImpl.updateRow(id);
             z.setName("With comission");
         }else{
