@@ -21,7 +21,7 @@ public class Settings implements Serializable {
     @Column(name = "status")
     private String status;
 
-    public Settings() {
+        public Settings() {
 
     }
 
@@ -56,6 +56,7 @@ public class Settings implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
 
     @Override
     public String toString() {

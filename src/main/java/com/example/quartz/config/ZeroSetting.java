@@ -1,5 +1,8 @@
 package com.example.quartz.config;
 
+import org.springframework.stereotype.Component;
+
+
 public class ZeroSetting {
     private String name = "cur";
 

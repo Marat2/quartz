@@ -1,6 +1,7 @@
 package com.example.quartz.config;
 
 import org.quartz.impl.StdSchedulerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,10 +16,11 @@ public class SpringConfig {
     public StdSchedulerFactory matchingSchedulerFactoryH() {
         return new StdSchedulerFactory();
     }
-    @Bean(name = "bye")
+
+    /*@Bean(name = "bye")
     public StdSchedulerFactory matchingSchedulerFactoryB() {
         return new StdSchedulerFactory();
-    }
+    }*/
     @Bean
     public ZeroSetting setZero(){
         return new ZeroSetting();

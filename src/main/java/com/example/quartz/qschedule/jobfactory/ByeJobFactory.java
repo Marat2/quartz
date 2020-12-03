@@ -1,7 +1,6 @@
 package com.example.quartz.qschedule.jobfactory;
 
 import com.example.quartz.config.ZeroSetting;
-import com.example.quartz.domain.dao.SettingDaoHibernateImpl;
 import com.example.quartz.qschedule.job.ByeJob;
 import org.quartz.Job;
 import org.quartz.Scheduler;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 public class ByeJobFactory implements JobFactory {
 
     private ZeroSetting s;
-
 
     public ByeJobFactory(ZeroSetting s) {
         this.s = s;

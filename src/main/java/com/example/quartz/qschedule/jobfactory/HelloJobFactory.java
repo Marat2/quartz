@@ -7,20 +7,30 @@ import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HelloJobFactory implements JobFactory {
+public class HelloJobFactory implements JobFactory , ApplicationContextAware {
     private SettingDaoHibernateImpl settingDaoHibernateImpl;
-    private ZeroSetting s;
 
-    public HelloJobFactory(SettingDaoHibernateImpl settingDaoHibernateImpl,ZeroSetting s) {
+    private ZeroSetting s;
+    private ApplicationContext applicationContext;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+
+    public HelloJobFactory(SettingDaoHibernateImpl settingDaoHibernateImpl) {
         this.settingDaoHibernateImpl = settingDaoHibernateImpl;
-        this.s=s;
     }
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) {
-        return new HelloJob(settingDaoHibernateImpl, s);
+        ZeroSetting a = applicationContext.getBean( ZeroSetting.class );
+        return new HelloJob(settingDaoHibernateImpl, a);
     }
 }

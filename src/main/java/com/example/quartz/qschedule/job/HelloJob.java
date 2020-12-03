@@ -14,6 +14,7 @@ public class HelloJob implements Job {
 
 
     private SettingDaoHibernateImpl settingDaoHibernateImpl;
+
     private ZeroSetting z ;
     public HelloJob() {
     }
@@ -27,7 +28,18 @@ public class HelloJob implements Job {
     {
         JobDataMap data = context.getMergedJobDataMap();
         System.err.println("Hello!  HelloJob is executing with id "+data.get("job_id").toString());
-        z.setName("cur");
+
+        System.out.println(data.get("job_id").toString().startsWith("end_"));
+
+        if (data.get("job_id").toString().startsWith("end_")){
+            System.out.println("ggg");
+            String id = data.get("job_id").toString().substring(data.get("job_id").toString().indexOf("_")+1);
+            settingDaoHibernateImpl.updateRow(id);
+            z.setName("With comission");
+        }else{
+            System.out.println("zzzzz");
+            z.setName("Without comission");
+        }
     }
 
 }

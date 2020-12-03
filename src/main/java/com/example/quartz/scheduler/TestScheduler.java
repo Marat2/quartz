@@ -35,22 +35,20 @@ public class TestScheduler {
     Logger logger = LoggerFactory.getLogger(getClass());
 
 
+    /*@Autowired
+    @Qualifier("hello")
+    StdSchedulerFactory factoryH;
+    @Qualifier("bye")
+    StdSchedulerFactory factoryB;*/
+
     private Scheduler instanceH;
-    private Scheduler instanceB;
+    //private Scheduler instanceB;
     private SettingDaoHibernateImpl settingDaoHibernateImpl;
     private ZeroSetting settings;
-    /*public TestScheduler() {
-        try {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
 
-    }*/
     @Autowired
-    public TestScheduler(HelloJobFactory jobFactory, ByeJobFactory jonFactoryB,
-                         @Qualifier("hello") StdSchedulerFactory factoryH, @Qualifier("bye") StdSchedulerFactory factoryB,
+    public TestScheduler(HelloJobFactory jobFactory/*, ByeJobFactory jonFactoryB*/,
+                         @Qualifier("hello") StdSchedulerFactory factoryH, /*@Qualifier("bye") StdSchedulerFactory factoryB,*/
                          SettingDaoHibernateImpl settingDaoHibernateImpl, ZeroSetting settings) {
          try{
              this.settingDaoHibernateImpl = settingDaoHibernateImpl;
@@ -59,53 +57,57 @@ public class TestScheduler {
              instanceH = factoryH.getScheduler();
              instanceH.setJobFactory(jobFactory);
              instanceH.start();
-
-             instanceB = factoryB.getScheduler();
+             //System.out.println("222 :  "+factoryH.getScheduler()+" "+factoryB.getScheduler());
+             /*System.out.println("sss :  "+instanceH+" "+instanceB);
+             instanceB = factoryB.getScheduler();//из за того что они возвращают одинаковый объект по сути далее я просто меняю фабрику у одного и того же шедулера
              instanceB.setJobFactory(jonFactoryB);
-             instanceB.start();
-
+             instanceB.start();*/
+             //System.out.println("sss :  "+instanceH+" "+instanceB);
              logger.debug("Quartz matching job scheduler started running");
          } catch (SchedulerException ex) {
              logger.error("There was a problem with scheduler or job factory", ex);
              throw new RuntimeException(ex);
          }
-
     }
+
+
 
     @Scheduled(fixedDelay = 5000)
     public void scheduleFixedDelayTask() {
         try {
-
         //add jobs and triggers into sched (old job and triggers replaced by new)
         for (Settings row :settingDaoHibernateImpl.getAllSettings()){
             Date start = new Date(row.getStart().getTime());
             Date end = new Date(row.getEnd().getTime());
 
             JobDetail startJob = driverMatcherJobDetailHello(row.getId().toString());
-            JobDetail endJob = driverMatcherJobDetailBye(row.getId().toString());
-
+            //JobDetail endJob = driverMatcherJobDetailBye(row.getId().toString());
+            JobDetail endJob = driverMatcherJobDetailHello("end_"+row.getId().toString());
             Trigger triggerHello = simpleTriggerWithIdentityForHello(startJob,start,row.getId().toString());
-            Trigger triggerBye = simpleTriggerWithIdentityForBye(endJob,end,row.getId().toString());
-
+            //Trigger triggerBye = simpleTriggerWithIdentityForBye(endJob,end,row.getId().toString());
+            Trigger triggerBye = simpleTriggerWithIdentityForHello(endJob,end,"end_"+row.getId().toString());
             logger.info("bean : "+settings.getName());
 
-            if (!instanceH.getJobKeys(groupEquals("group1")).contains(startJob.getKey()) ) {
+            if (!instanceH.getJobKeys(groupEquals("group1")).contains(startJob.getKey())) {
                 instanceH.scheduleJob(startJob, triggerHello);
             }
-            if (! instanceB.getJobKeys(groupEquals("group2")).contains(endJob.getKey())) {
-                instanceB.scheduleJob(endJob, triggerBye);
+            if (!instanceH.getJobKeys(groupEquals("group1")).contains(endJob.getKey()) ) {
+                instanceH.scheduleJob(endJob, triggerBye);
             }
+            /*if (! instanceB.getJobKeys(groupEquals("group2")).contains(endJob.getKey())) {
+                instanceB.scheduleJob(endJob, triggerBye);
+            }*/
             logger.info("bean after : "+settings.getName());
         }
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
-        try {
-            System.out.println("group1 : "+instanceH.getJobKeys(groupEquals("group1")));
-            System.out.println("group2 : "+instanceB.getJobKeys(groupEquals("group2")));
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
+        //try {
+            //System.out.println("group1 : "+instanceH.getJobKeys(groupEquals("group1")));
+            //System.out.println("group2 : "+instanceB.getJobKeys(groupEquals("group2")));
+        //} catch (SchedulerException e) {
+        //    e.printStackTrace();
+        //}
     }
 
     @PostConstruct
@@ -121,19 +123,20 @@ public class TestScheduler {
                 .build();
     }
 
-    private Trigger simpleTriggerWithIdentityForBye(JobDetail jobDetail, Date localDateTime, String triggerKey) {
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail)
-                .withIdentity(TriggerKey.triggerKey("endtrigger"+triggerKey))
-                .startAt(localDateTime)
-                .build();
-    }
     private JobDetail driverMatcherJobDetailHello(String rideId) {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("job_id", rideId);
 
         return JobBuilder.newJob().ofType(HelloJob.class).withIdentity("startjob_"+rideId, "group1").
                 usingJobData(jobDataMap).storeDurably(true).build();
+    }
+
+    private Trigger simpleTriggerWithIdentityForBye(JobDetail jobDetail, Date localDateTime, String triggerKey) {
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withIdentity(TriggerKey.triggerKey("endtrigger"+triggerKey))
+                .startAt(localDateTime)
+                .build();
     }
 
     private JobDetail driverMatcherJobDetailBye(String rideId) {
