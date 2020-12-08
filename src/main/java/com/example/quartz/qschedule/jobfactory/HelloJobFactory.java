@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HelloJobFactory implements JobFactory , ApplicationContextAware {
-    private SettingDaoHibernateImpl settingDaoHibernateImpl;
+    //private SettingDaoHibernateImpl settingDaoHibernateImpl;
 
-    private ZeroSetting s;
+
     private ApplicationContext applicationContext;
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -24,13 +24,14 @@ public class HelloJobFactory implements JobFactory , ApplicationContextAware {
     }
 
 
-    public HelloJobFactory(SettingDaoHibernateImpl settingDaoHibernateImpl) {
+    /*public HelloJobFactory(SettingDaoHibernateImpl settingDaoHibernateImpl) {
         this.settingDaoHibernateImpl = settingDaoHibernateImpl;
-    }
+    }*/
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) {
         ZeroSetting a = applicationContext.getBean( ZeroSetting.class );
-        return new HelloJob(settingDaoHibernateImpl, a);
+
+        return new HelloJob(/*settingDaoHibernateImpl,*/ a);
     }
 }

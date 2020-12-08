@@ -55,9 +55,8 @@ public class TestScheduler {
     public void scheduleFixedDelayTask() {
         try {
         //add jobs and triggers into sched (old job and triggers replaced by new)
-        for (Settings row :settingDaoHibernateImpl.getAllSettings()){
-            //Date start = new Date(row.getStart().getTime());
-            //Date end = new Date(row.getEnd().getTime());
+        /*for (Settings row :settingDaoHibernateImpl.getAllSettings()){
+
             Date start =  Date.from(row.getStart().toInstant());
             Date end =  Date.from(row.getEnd().toInstant());
 
@@ -74,7 +73,7 @@ public class TestScheduler {
                 instanceH.scheduleJob(endJob, triggerBye);
             }
             logger.info("bean after : "+settings.getName());
-        }
+        }*/
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
